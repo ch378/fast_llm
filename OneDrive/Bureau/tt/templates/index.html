@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Gemma + Embedding + Redis</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body { font-family: Arial; background:#f2f2f2; padding:30px; }
+        #chat { background:white; padding:20px; height:300px; overflow:auto; border-radius:10px; }
+        input { width:75%; padding:10px; }
+        button { padding:10px; }
+        .user { color:blue; margin-top:10px; }
+        .bot { color:green; margin-top:10px; }
+        .embedding { margin-top:10px; }
+    </style>
+</head>
+<body>
+
+<h2>🧠 Gemma + Embedding + Redis</h2>
+
+<div id="chat"></div>
+<br>
+<input id="msg" placeholder="Tapez votre message ici">
+<button onclick="send()">Envoyer</button>
+
+<div class="embedding">
+    <canvas id="embeddingChart" width="800" height="200"></canvas>
+</div>
+
+<script>
+let chart;
+
+async function send() {
+    const message = document.getElementById("msg").value;
+    const chat = document.getElementById("chat");
+
+    chat.innerHTML += `<div class="user"><b>Vous:</b> ${message}</div>`;
+
+    const response = await fetch("/chat", {
+        method: "POST",
+        headers: {"Content-Type":"application/json"},
+        body: JSON.stringify({message})
+    });
+
+    const data = await response.json();
+
+    chat.innerHTML += `<div class="bot"><b>Gemma:</b> ${data.response}</div>`;
+    chat.innerHTML += `<div class="embedding"><b>Saved in Redis:</b> ${data.redis_key}</div>`;
+
+    // Graphique Chart.js
+    const ctx = document.getElementById('embeddingChart').getContext('2d');
+    if(chart) chart.destroy();
+
+    chart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: data.embedding.map((_, i) => i+1),
+            datasets: [{
+                label: 'Embedding Preview',
+                data: data.embedding,
+                borderColor: 'purple',
+                fill: false,
+                tension: 0.3
+            }]
+        },
+        options: { scales: { y: { beginAtZero: false } } }
+    });
+
+    document.getElementById("msg").value = "";
+    chat.scrollTop = chat.scrollHeight;
+}
+</script>
+
+</body>
+</html>
