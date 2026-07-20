@@ -1,0 +1,10 @@
+{
+  "provider": "mastercard",
+  "task": "csv_quality_classification",
+  "input": "C:\\Users\\chadl\\Documents\\Codex\\2026-07-07\\you-are-an-expert-python-developer\\evaluation\\labels\\mastercard\\MCBS_reference_pages_5_15.csv",
+  "rows": 49,
+  "valid_rows": 34,
+  "needs_review_rows": 15,
+  "feature_count": 14,
+  "model_format": "pickle"
+}
